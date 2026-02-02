@@ -1,0 +1,257 @@
+databaseChangeLog:
+
+  - changeSet:
+      id: init-cps-table
+      author: hamza
+      changes:
+        - createTable:
+            tableName: cps
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: title
+                  type: VARCHAR(255)
+              - column:
+                  name: content
+                  type: BYTEA
+
+
+
+  - changeSet:
+      id: init-contrat-table
+      author: hamza
+      changes:
+        - createTable:
+            tableName: contrat
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: bordeaux
+                  type: BYTEA
+              - column:
+                  name: lettre_dengagement
+                  type: BYTEA
+
+
+
+  - changeSet:
+      id: init-cadre-achat-table
+      author: hamza
+      changes:
+        - createTable:
+            tableName: cadre_achat
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
+              - column:
+                  name: reference
+                  type: VARCHAR(255)
+
+              - column:
+                  name: specification_technique
+                  type: VARCHAR(2000)
+
+              - column:
+                  name: type_achat
+                  type: VARCHAR(50)
+
+              - column:
+                  name: status
+                  type: VARCHAR(50)
+
+              - column:
+                  name: creation_date
+                  type: TIMESTAMP
+
+              - column:
+                  name: modification_date
+                  type: TIMESTAMP
+
+              - column:
+                  name: meilleur_offre
+                  type: BIGINT
+
+              - column:
+                  name: cps_id
+                  type: BIGINT
+
+        - addForeignKeyConstraint:
+            baseTableName: cadre_achat
+            baseColumnNames: cps_id
+            referencedTableName: cps
+            referencedColumnNames: id
+            constraintName: fk_cadre_achat_cps
+
+
+
+  - changeSet:
+      id: init-fournisseur-table
+      author: hamza
+      changes:
+        - createTable:
+            tableName: fournisseur
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
+              - column:
+                  name: nom_prenom
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: rcs
+                  type: BIGINT
+
+              - column:
+                  name: contrat_id
+                  type: BIGINT
+
+        - addForeignKeyConstraint:
+            baseTableName: fournisseur
+            baseColumnNames: contrat_id
+            referencedTableName: contrat
+            referencedColumnNames: id
+            constraintName: fk_fournisseur_contrat
+
+
+
+  - changeSet:
+      id: init-offre-fournisseur-table
+      author: hamza
+      changes:
+        - createTable:
+            tableName: offre_fournisseur
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
+              - column:
+                  name: offre_technique
+                  type: BYTEA
+
+              - column:
+                  name: offre_commercial
+                  type: BYTEA
+
+              - column:
+                  name: creation_date
+                  type: TIMESTAMP
+
+              - column:
+                  name: fournisseur_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: cadre_achat_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+
+        - addForeignKeyConstraint:
+            baseTableName: offre_fournisseur
+            baseColumnNames: fournisseur_id
+            referencedTableName: fournisseur
+            referencedColumnNames: id
+            constraintName: fk_offre_fournisseur_fournisseur
+
+        - addForeignKeyConstraint:
+            baseTableName: offre_fournisseur
+            baseColumnNames: cadre_achat_id
+            referencedTableName: cadre_achat
+            referencedColumnNames: id
+            constraintName: fk_offre_fournisseur_cadre_achat
+
+
+
+  - changeSet:
+      id: init-evaluation-result-table
+      author: hamza
+      changes:
+        - createTable:
+            tableName: evaluation_result
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
+              - column:
+                  name: confirmed
+                  type: BOOLEAN
+
+              - column:
+                  name: score_technique
+                  type: INT
+
+              - column:
+                  name: score_financier
+                  type: INT
+
+              - column:
+                  name: score_global
+                  type: INT
+
+              - column:
+                  name: justification
+                  type: VARCHAR(1000)
+
+              - column:
+                  name: fournisseur_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: cadre_achat_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+
+        - addForeignKeyConstraint:
+            baseTableName: evaluation_result
+            baseColumnNames: fournisseur_id
+            referencedTableName: fournisseur
+            referencedColumnNames: id
+            constraintName: fk_evaluation_fournisseur
+
+        - addForeignKeyConstraint:
+            baseTableName: evaluation_result
+            baseColumnNames: cadre_achat_id
+            referencedTableName: cadre_achat
+            referencedColumnNames: id
+            constraintName: fk_evaluation_cadre_achat
