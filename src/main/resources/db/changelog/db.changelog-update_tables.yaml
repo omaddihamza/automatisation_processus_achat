@@ -1,0 +1,15 @@
+databaseChangeLog:
+
+
+  - changeSet:
+      id: make-fournisseur-cadre-optional
+      author: hamza
+      changes:
+        - dropNotNullConstraint:
+            tableName: offre_fournisseur
+            columnName: fournisseur_id
+            columnDataType: BIGINT
+        - dropNotNullConstraint:
+            tableName: offre_fournisseur
+            columnName: cadre_achat_id
+            columnDataType: BIGINT
