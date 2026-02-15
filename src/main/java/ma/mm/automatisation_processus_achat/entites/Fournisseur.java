@@ -1,9 +1,12 @@
+/*
 package ma.mm.automatisation_processus_achat.entites;
+
 
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.List;
+
 
 @Entity
 @Getter @Setter @AllArgsConstructor @NoArgsConstructor @Builder
@@ -18,3 +21,4 @@ public class Fournisseur {
     @OneToOne
     private Contrat contrat;
 }
+*/

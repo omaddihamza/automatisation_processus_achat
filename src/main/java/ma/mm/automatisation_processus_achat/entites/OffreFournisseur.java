@@ -1,3 +1,4 @@
+/*
 package ma.mm.automatisation_processus_achat.entites;
 
 import jakarta.persistence.*;
@@ -29,3 +30,4 @@ public class OffreFournisseur {
     @JoinColumn(name = "cadre_achat_id", nullable = true)
     private CadreAchat cadreAchat;
 }
+*/
