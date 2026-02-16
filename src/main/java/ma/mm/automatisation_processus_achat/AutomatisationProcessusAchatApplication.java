@@ -19,5 +19,16 @@ public class AutomatisationProcessusAchatApplication {
                 = SimpleVectorStore.builder(embeddingModel).build();
         return vectorStore;
     }
+
+   /* @Bean
+    public SimpleVectorStore cpsVectorStore(EmbeddingModel embeddingModel) {
+        return SimpleVectorStore.builder(embeddingModel).build();
+    }
+
+    @Bean
+    public SimpleVectorStore fournisseurVectorStore(EmbeddingModel embeddingModel) {
+        return SimpleVectorStore.builder(embeddingModel).build();
+    }*/
+
 }
 

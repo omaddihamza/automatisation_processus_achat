@@ -39,9 +39,7 @@ public class DocumentIndexor {
     private ChatClient chatClient;
 
     public DocumentIndexor(
-            SimpleVectorStore vectorStore , ChatClient.Builder ChatClient, ObjectMapper objectMapper,
-            CpsService cpsService) {
-        this.vectorStore = vectorStore;
+           ChatClient.Builder ChatClient, ObjectMapper objectMapper,CpsService cpsService) {
         this.chatClient = ChatClient.build();
         this.objectMapper = objectMapper;
         this.cpsService = cpsService;
@@ -68,8 +66,10 @@ public class DocumentIndexor {
                 .topK(20)
                 .build();
     }
-//load file cps
-public String loadFileCPS(MultipartFile pdfFile) throws JsonProcessingException {
+
+
+    //load file cps
+   /* public String loadFileCPS(MultipartFile pdfFile) throws JsonProcessingException {
     Path path = Path.of("src", "main", "resources", "store");
     File file = new File(path.toFile(), fileStore);
     if (file.exists()) {
@@ -131,27 +131,47 @@ public String loadFileCPS(MultipartFile pdfFile) throws JsonProcessingException 
     //  Sauvegarder en mémoire
     cpsService.savePostes(postes);
     return jsonResponse;
-}
+}*/
 
 
 
     /**
      * Charger et indexer plusieurs fichiers PDF
      */
-    public void loadFilesFournisseur(MultipartFile[] pdfFiles, String type, String fournisseur) {
+    /*public void loadFilesFournisseur(MultipartFile[] pdfFiles, String type, String fournisseur) {
 
         Path path = Path.of("src", "main", "resources", "storeFournisseur");
         File file = new File(path.toFile(), fileStoreFournisseur);
+        if (file.exists()) {
+            vectorStore.load(file);
+        }
 
         for (MultipartFile pdfFile : pdfFiles) {
 
             // Lire le PDF et transformer en documents
             PagePdfDocumentReader pdfDocumentReader = new PagePdfDocumentReader(pdfFile.getResource());
-            List<Document> documents = pdfDocumentReader.get();
+            List<Document> pages = pdfDocumentReader.get();
+            if (!pages.isEmpty()) {
+                //  première page uniquement
+                String firstPageText = pages.get(0).getText();
 
+                //stocker seulement cette page
+                Document firstPageDoc = new Document(firstPageText);
+                firstPageDoc.getMetadata().put("fournisseur", fournisseur);
+                firstPageDoc.getMetadata().put("type", "OFFER_FIRST_PAGE");
+
+                vectorStore.add(List.of(firstPageDoc));
+
+            }
+
+        }
+
+
+*/
+    /*
             // Découper les documents en chunks
             TextSplitter textSplitter = new TokenTextSplitter();
-            List<Document> chunks = textSplitter.apply(documents);
+            List<Document> chunks = textSplitter.apply(pages);
 
             // Ajouter les métadonnées
             for (Document chunk : chunks) {
@@ -164,9 +184,11 @@ public String loadFileCPS(MultipartFile pdfFile) throws JsonProcessingException 
             vectorStore.add(chunks);
         }
 
+ *//*
+
         // Sauvegarder le vector store sur fichier
         vectorStore.save(file);
-    }
+    }*/
 
 
 }

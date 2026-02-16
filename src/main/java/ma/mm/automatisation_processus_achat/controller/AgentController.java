@@ -2,6 +2,7 @@ package ma.mm.automatisation_processus_achat.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import ma.mm.automatisation_processus_achat.agents.AiAgent;
+import ma.mm.automatisation_processus_achat.rag.CpsService;
 import ma.mm.automatisation_processus_achat.rag.DocumentIndexor;
 import ma.mm.automatisation_processus_achat.rag.FournisseurService;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -27,14 +28,16 @@ import java.util.stream.Collectors;
 @RestController
 public class AgentController {
     private final VectorStore vectorStore;
+    private final CpsService cpsService;
     private AiAgent aiAgent;
     private DocumentIndexor indexor;
     private FournisseurService fournisseurService;
-    public AgentController(AiAgent agent, DocumentIndexor indexor, VectorStore vectorStore, FournisseurService fournisseurService) {
+    public AgentController(AiAgent agent, DocumentIndexor indexor, VectorStore vectorStore, FournisseurService fournisseurService, CpsService cpsService) {
         this.aiAgent = agent;
         this.indexor = indexor;
         this.vectorStore = vectorStore;
         this.fournisseurService = fournisseurService;
+        this.cpsService = cpsService;
     }
 
     @GetMapping(value = "/askAgent", produces = MediaType.TEXT_PLAIN_VALUE)
@@ -52,14 +55,14 @@ public class AgentController {
 
     @PostMapping(value = "/uploadCPS", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.MULTIPART_FORM_DATA_VALUE)
     public String uploadCPS(@RequestPart("file") MultipartFile file) throws JsonProcessingException {
-        return indexor.loadFileCPS(file);
+        return cpsService.loadFileCPS(file);
     }
 
     @PostMapping(value = "/uploadFournisseur",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Map<String, Object> uploadFournisseur(
             @RequestPart("files") MultipartFile[] files,
-            @RequestParam String fournisseur) throws IOException {
+            @RequestParam String fournisseur)  {
         return fournisseurService.processFournisseur(files, fournisseur);
     }
 
