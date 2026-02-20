@@ -12,6 +12,7 @@ import org.springframework.ai.transformer.splitter.TextSplitter;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.SimpleVectorStore;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,11 +33,13 @@ public class CpsService {
     private final String fileStore = "storeCPS.json";
     private ChatClient chatClient;
 
-    public CpsService(SimpleVectorStore cpsVectorStore, ChatClient.Builder chatClient,
-                      ObjectMapper objectMapper) {
-        this.cpsVectorStore = cpsVectorStore;
-        this.chatClient = chatClient.build();
-        this.objectMapper = objectMapper;
+    public CpsService(
+            @Qualifier("cpsStore")
+            SimpleVectorStore cpsVectorStore,
+            ChatClient.Builder chatClient, ObjectMapper objectMapper) {
+            this.cpsVectorStore = cpsVectorStore;
+            this.chatClient = chatClient.build();
+            this.objectMapper = objectMapper;
     }
 
     public String loadFileCPS(MultipartFile pdfFile) throws JsonProcessingException {
@@ -70,9 +73,9 @@ public class CpsService {
         String prompt = """
         Voici un extrait du CPS contenant un bordereau des prix.
         
-        Extrais uniquement la liste des postes sous format JSON.
-        Les postes se trouvent dans le bordereau.
-        Si le poste a une designation abreviee cherche le nom complet dans le cps et adapte le nom complet pour le poste
+        Extrais uniquement la liste des postes qui se trouvent dans le bordereau
+        Extrais ces postes sous format JSON.
+        Si le poste dans qui est dans le bordereau a une designation abreviee cherche le nom complet dans le reste des articles du cps et adapte le nom complet pour le poste
         Chaque poste doit contenir :
         - numero
         - designation

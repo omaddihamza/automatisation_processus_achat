@@ -1,13 +1,12 @@
 package ma.mm.automatisation_processus_achat.rag;
 
-import lombok.Value;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.reader.pdf.PagePdfDocumentReader;
 import org.springframework.ai.vectorstore.SimpleVectorStore;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
@@ -19,10 +18,12 @@ public class FournisseurService {
     private SimpleVectorStore fournisseurVectorStore;
 
     public FournisseurService(DocumentIndexor indexor,
-                              ComparisonService comparisonService,SimpleVectorStore fournisseurVectorStore) {
-        this.indexor = indexor;
-        this.comparisonService = comparisonService;
-        this.fournisseurVectorStore = fournisseurVectorStore;
+                              ComparisonService comparisonService,
+                              @Qualifier("fournisseurStore")
+                              SimpleVectorStore fournisseurVectorStore) {
+                            this.indexor = indexor;
+                            this.comparisonService = comparisonService;
+                            this.fournisseurVectorStore = fournisseurVectorStore;
     }
 
    public Map<String, Object> processFournisseur(
@@ -64,26 +65,6 @@ public class FournisseurService {
             }
 
         }
-
-
-/*
-            // Découper les documents en chunks
-            TextSplitter textSplitter = new TokenTextSplitter();
-            List<Document> chunks = textSplitter.apply(pages);
-
-            // Ajouter les métadonnées
-            for (Document chunk : chunks) {
-                chunk.getMetadata().put("type", type);
-                chunk.getMetadata().put("fournisseur", fournisseur);
-                chunk.getMetadata().put("fileName", pdfFile.getOriginalFilename());
-            }
-
-            // Ajouter au vector store
-            vectorStore.add(chunks);
-        }
-
- */
-
         // Sauvegarder le vector store sur fichier
         fournisseurVectorStore.save(file);
     }

@@ -13,12 +13,12 @@ public class AutomatisationProcessusAchatApplication {
     public static void main(String[] args) {
         SpringApplication.run(AutomatisationProcessusAchatApplication.class, args);
     }
-    @Bean //1. creer un vectorStore
+ /*   @Bean //1. creer un vectorStore
     public SimpleVectorStore simpleVectorStore(EmbeddingModel embeddingModel){
         SimpleVectorStore vectorStore
                 = SimpleVectorStore.builder(embeddingModel).build();
         return vectorStore;
-    }
+    }*/
 
    /* @Bean
     public SimpleVectorStore cpsVectorStore(EmbeddingModel embeddingModel) {

@@ -4,7 +4,8 @@ import ma.mm.automatisation_processus_achat.model.Poste;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
-import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.ai.vectorstore.SimpleVectorStore;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -16,51 +17,19 @@ import java.util.stream.Collectors;
 @Service
 public class ComparisonService {
 
-    private final VectorStore vectorStore;
+    private SimpleVectorStore fournisseurVectorStore;
     private final ChatClient chatClient;
     private final CpsService cpsService;
 
-    public ComparisonService(VectorStore vectorStore,
+
+    public ComparisonService(
+            @Qualifier("fournisseurStore")
+            SimpleVectorStore fournisseurVectorStore,
                              ChatClient.Builder builder, CpsService cpsService) {
-        this.vectorStore = vectorStore;
+        this.fournisseurVectorStore = fournisseurVectorStore;
         this.chatClient = builder.build();
         this.cpsService = cpsService;
     }
-
-    /*public Map<String, Object> verifierConformite(String fournisseur) {
-
-        List<Poste> postesCps = cpsService.getPostes(); // déjà extraits
-
-        List<String> postesManquants = new ArrayList<>();
-
-        for (Poste poste : postesCps) {
-
-            SearchRequest request = SearchRequest.builder()
-                    .query(poste.getDesignation())
-                    .topK(5)
-                    .build();
-
-            List<Document> results = vectorStore.similaritySearch(request);
-
-            //  Filtrer uniquement documents du fournisseur
-            boolean found = results.stream()
-                    .anyMatch(doc ->
-                            fournisseur.equals(doc.getMetadata().get("fournisseur"))
-                                    && "OFFER".equals(doc.getMetadata().get("type"))
-                    );
-
-            if (!found) {
-                postesManquants.add(poste.getDesignation());
-            }
-        }
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("fournisseur", fournisseur);
-        response.put("conforme", postesManquants.isEmpty());
-        response.put("postesManquants", postesManquants);
-
-        return response;
-    }*/
 
     public Map<String, Object> verifierConformite(String fournisseur) {
 
@@ -72,7 +41,7 @@ public class ComparisonService {
                 .topK(20)
                 .build();
 
-        List<Document> docs = vectorStore.similaritySearch(request);
+        List<Document> docs = fournisseurVectorStore.similaritySearch(request);
 
         String firstPageText = docs.stream()
                 .filter(doc ->
@@ -108,11 +77,9 @@ public class ComparisonService {
                 .content();
 
 
-        // 3️⃣ Transformer en List<Map> manuellement
-        // Supposons que le LLM renvoie toujours ce format simple
+        //  Transformer en List<Map> manuellement
         List<Map<String, String>> postesList = new ArrayList<>();
 
-        // Split sur les objets JSON individuels
         String[] items = responseLLM.replace("[", "").replace("]", "").split("\\},\\s*\\{");
         for (String item : items) {
             item = item.replace("{", "").replace("}", "").trim();
@@ -129,74 +96,12 @@ public class ComparisonService {
             postesList.add(map);
         }
 
-        // 4️⃣ Créer la réponse finale
         Map<String, Object> response = new HashMap<>();
         response.put("fournisseur", fournisseur);
         response.put("postes", postesList);
 
         return response;
-
-
-//        return Map.of("result", response);
     }
-
-   /* public Map<String, Object> verifierConformite(String fournisseur) {
-
-        List<Poste> postesCps = cpsService.getPostes(); // postes du CPS
-
-        // 🔹 Récupérer toutes les premières pages du fournisseur
-        SearchRequest request = SearchRequest.builder()
-                .query("") // vide pour récupérer tous les documents
-                .topK(100) // prend jusqu'à 100 documents, ou plus selon ton besoin
-                .build();
-
-        List<Document> docs = vectorStore.similaritySearch(request);
-
-        // filtrer uniquement les premières pages du fournisseur
-        List<String> firstPages = docs.stream()
-                .filter(doc -> fournisseur.equals(doc.getMetadata().get("fournisseur"))
-                        && "OFFER_FIRST_PAGE".equals(doc.getMetadata().get("type")))
-                .map(Document::getText)
-                .collect(Collectors.toList());
-
-        List<String> postesManquants = new ArrayList<>();
-
-        // 🔹 Comparer chaque poste CPS avec les premières pages
-        for (Poste poste : postesCps) {
-            boolean trouve = false;
-
-            for (String page : firstPages) {
-                // Utiliser un embedding ou similarity simple
-                SearchRequest searchRequest = SearchRequest.builder()
-                        .query(poste.getDesignation())
-                        .topK(1)
-                        .build();
-
-                List<Document> result = vectorStore.similaritySearch(searchRequest);
-
-                // Vérifier si la page du fournisseur correspond au poste
-                for (Document doc : result) {
-                    if (doc.getText().equals(page)) { // ou comparer le score si disponible
-                        trouve = true;
-                        break;
-                    }
-                }
-
-                if (trouve) break;
-            }
-
-            if (!trouve) {
-                postesManquants.add(poste.getDesignation());
-            }
-        }
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("fournisseur", fournisseur);
-        response.put("conforme", postesManquants.isEmpty());
-        response.put("postesManquants", postesManquants);
-
-        return response;
-    }*/
 
 }
 

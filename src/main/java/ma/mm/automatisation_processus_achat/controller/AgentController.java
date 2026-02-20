@@ -5,21 +5,15 @@ import ma.mm.automatisation_processus_achat.agents.AiAgent;
 import ma.mm.automatisation_processus_achat.rag.CpsService;
 import ma.mm.automatisation_processus_achat.rag.DocumentIndexor;
 import ma.mm.automatisation_processus_achat.rag.FournisseurService;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.text.PDFTextStripper;
-import org.springframework.ai.document.Document;
-import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
-import org.springframework.ai.vectorstore.filter.Filter;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Flux;
 
-import java.io.IOException;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+
 
 /**
  * @author Siham
@@ -32,7 +26,9 @@ public class AgentController {
     private AiAgent aiAgent;
     private DocumentIndexor indexor;
     private FournisseurService fournisseurService;
-    public AgentController(AiAgent agent, DocumentIndexor indexor, VectorStore vectorStore, FournisseurService fournisseurService, CpsService cpsService) {
+    public AgentController(AiAgent agent, DocumentIndexor indexor,
+                           @Qualifier("aiStore")
+                           VectorStore vectorStore, FournisseurService fournisseurService, CpsService cpsService) {
         this.aiAgent = agent;
         this.indexor = indexor;
         this.vectorStore = vectorStore;
@@ -53,7 +49,8 @@ public class AgentController {
 
 
 
-    @PostMapping(value = "/uploadCPS", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/uploadCPS", consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+            produces = MediaType.MULTIPART_FORM_DATA_VALUE)
     public String uploadCPS(@RequestPart("file") MultipartFile file) throws JsonProcessingException {
         return cpsService.loadFileCPS(file);
     }
@@ -65,6 +62,19 @@ public class AgentController {
             @RequestParam String fournisseur)  {
         return fournisseurService.processFournisseur(files, fournisseur);
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
  /*   @PostMapping(value = "/uploadFournisseur", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public String uploadFournisseur(
