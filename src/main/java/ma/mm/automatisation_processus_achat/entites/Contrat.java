@@ -1,3 +1,4 @@
+/*
 package ma.mm.automatisation_processus_achat.entites;
 
 import jakarta.persistence.*;
@@ -13,3 +14,4 @@ public class Contrat {
     @Lob
     private byte[] letteDengagement;
 }
+*/

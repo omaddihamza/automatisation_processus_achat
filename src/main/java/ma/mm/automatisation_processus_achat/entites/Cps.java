@@ -1,3 +1,4 @@
+/*
 package ma.mm.automatisation_processus_achat.entites;
 
 import jakarta.persistence.*;
@@ -12,3 +13,4 @@ public class Cps {
     @Lob
     private byte[] content;
 }
+*/

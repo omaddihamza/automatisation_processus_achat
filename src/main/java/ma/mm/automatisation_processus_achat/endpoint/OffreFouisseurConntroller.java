@@ -1,3 +1,4 @@
+/*
 package ma.mm.automatisation_processus_achat.endpoint;
 
 import ma.mm.automatisation_processus_achat.entites.OffreFournisseur;
@@ -25,3 +26,4 @@ public class OffreFouisseurConntroller {
         return offreFournisseurService.saveOffreFournisseur(offreTechnique, offreCommercial);
     }
 }
+*/

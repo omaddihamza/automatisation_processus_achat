@@ -1,3 +1,4 @@
+/*
 package ma.mm.automatisation_processus_achat.entites;
 
 import jakarta.persistence.*;
@@ -19,3 +20,4 @@ public class EvaluationResult {
     @ManyToOne
     private CadreAchat cadreAchat;
 }
+*/

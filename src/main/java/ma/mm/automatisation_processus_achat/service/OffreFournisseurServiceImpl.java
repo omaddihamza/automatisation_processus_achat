@@ -1,3 +1,4 @@
+/*
 package ma.mm.automatisation_processus_achat.service;
 
 import ma.mm.automatisation_processus_achat.entites.OffreFournisseur;
@@ -34,3 +35,4 @@ public class OffreFournisseurServiceImpl implements IOffreFournisseurService {
         return offreFournisseurRepository.save(offreFournisseur);
     }
 }
+*/
