@@ -6,6 +6,7 @@ import ma.mm.automatisation_processus_achat.ocr.OcrPdfService;
 import ma.mm.automatisation_processus_achat.rag.CpsService;
 import ma.mm.automatisation_processus_achat.rag.DocumentIndexor;
 import ma.mm.automatisation_processus_achat.rag.FournisseurService;
+import ma.mm.automatisation_processus_achat.rag.OcrService;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
@@ -16,6 +17,10 @@ import reactor.core.publisher.Flux;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.Map;
 
 
@@ -31,17 +36,20 @@ public class AgentController {
     private DocumentIndexor indexor;
     private FournisseurService fournisseurService;
     private final OcrPdfService ocrPdfService;
+    private OcrService ocrService;
 
     public AgentController(AiAgent agent, DocumentIndexor indexor,
                            @Qualifier("aiStore")
                            VectorStore vectorStore, FournisseurService fournisseurService, CpsService cpsService
-                            , OcrPdfService ocrPdfService) {
+                            , OcrPdfService ocrPdfService,
+                           OcrService ocrService) {
         this.aiAgent = agent;
         this.indexor = indexor;
         this.vectorStore = vectorStore;
         this.fournisseurService = fournisseurService;
         this.cpsService = cpsService;
         this.ocrPdfService = ocrPdfService;
+        this.ocrService = ocrService;
     }
 
     @GetMapping(value = "/askAgent", produces = MediaType.TEXT_PLAIN_VALUE)
@@ -66,7 +74,7 @@ public class AgentController {
         return cpsService.loadFileCPS(file);
     }
 
-    @PostMapping(value = "/uploadFournisseur",
+    @PostMapping(value = "uploadFournisseur",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Map<String, Object> uploadFournisseur(
             @RequestPart("files") MultipartFile[] files,
@@ -74,6 +82,15 @@ public class AgentController {
         return fournisseurService.processFournisseur(files, fournisseur);
     }
 
+    @PostMapping("/api/chatbot/process-document")
+    public ResponseEntity<String> processDocument(@RequestParam String filePath) {
+        // 1. Appeler le service qui communique avec Python
+        String extractedText = ocrService.callPythonOcr(filePath);
+
+        // 2. Ici, tu pourrais ajouter l'appel à GPT-4 pour analyser le texte
+        // Pour l'instant, on retourne le texte brut extrait
+        return ResponseEntity.ok(extractedText);
+    }
 
 
   /*  @PostMapping(value = "/ocrPDF", consumes = "multipart/form-data")

@@ -48,6 +48,7 @@ public class FournisseurService {
 
         for (MultipartFile pdfFile : pdfFiles) {
 
+            /*
             // Lire le PDF et transformer en documents
             PagePdfDocumentReader pdfDocumentReader = new PagePdfDocumentReader(pdfFile.getResource());
             List<Document> pages = pdfDocumentReader.get();
@@ -62,8 +63,30 @@ public class FournisseurService {
 
                 fournisseurVectorStore.add(List.of(firstPageDoc));
 
-            }
 
+            }
+            */
+
+            // Lire le PDF et transformer en documents
+            PagePdfDocumentReader pdfDocumentReader = new PagePdfDocumentReader(pdfFile.getResource());
+            List<Document> pages = pdfDocumentReader.get();
+
+            if (!pages.isEmpty()) {
+                // Limite le nombre de pages à traiter à 5
+                int maxPages = Math.min(pages.size(), 5);
+
+                for (int i = 0; i < maxPages; i++) {
+                    String pageText = pages.get(i).getText();
+
+                    // Créer le Document pour chaque page
+                    Document pageDoc = new Document(pageText);
+                    pageDoc.getMetadata().put("fournisseur", fournisseur);
+                    pageDoc.getMetadata().put("type", "OFFER_PAGE_" + (i + 1));
+
+                    // Ajouter au vector store
+                    fournisseurVectorStore.add(List.of(pageDoc));
+                }
+            }
         }
         // Sauvegarder le vector store sur fichier
         fournisseurVectorStore.save(file);
